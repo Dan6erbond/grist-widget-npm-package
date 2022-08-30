@@ -3,15 +3,91 @@
   <head>
     <meta charset="utf-8" />
     <title>onRecord</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css"
+    />
     <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
   </head>
   <body>
-    <div v-scope>Package: {{ store.npmPackage }}</div>
+    <div v-scope class="pa3">
+      <div class="avenir measure pa3 shadow-2 br2">
+        <div>
+          <p class="f4 lh-copy">Package Overview</p>
+          <p>
+            {{ store.npmPackage.package }}
+            <a
+              href="{{ store.packageLink }}"
+              target="_blank"
+              class="red hover-dark-red no-underline"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w1 h1"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+                />
+              </svg>
+            </a>
+          </p>
+          <p><b>Version</b></p>
+          <p>{{ store.npmPackage.version }}</p>
+        </div>
+        <div v-if="store.npmPackage.reason !== undefined">
+          <p class="f4 lh-copy">Package Request</p>
+          <div class="bg-near-white pa2">
+            <p><b>Summary</b></p>
+            <p class="code">{{ store.summary }}</p>
+            <button @click="copySummary()">Copy</button>
+            <p><b>Description</b></p>
+            <textarea readonly class="code" wrap="soft" cols="40" rows="15">
+              {{ store.packageRequest }}
+            </textarea>
+            <button @click="copyRequest()">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <script type="module">
       import { createApp, reactive } from "https://unpkg.com/petite-vue?module";
 
       const store = reactive({
-        npmPackage: { package: "test" },
+        npmPackage: {
+          package: "Express",
+          slug: "express",
+          version: "1.0.0",
+          reason: "Because",
+          link: "npmjs.com/package/express",
+        },
+        get summary() {
+          return `Freigabe von Softwarepaket ${store.npmPackage.package}`;
+        },
+        get packageLink() {
+          return (
+            this.npmPackage.link ??
+            "https://npmjs.com/package/" + this.npmPackage.slug
+          );
+        },
+        get packageRequest() {
+          return `
+      Paket: ${this.npmPackage.package}
+
+      Version: ${this.npmPackage.version}
+
+      Link: ${this.packageLink}
+
+      Begründung:
+
+      ${this.npmPackage.reason}
+      `;
+        },
         setPackage(npmPackage) {
           this.npmPackage = npmPackage;
         },
@@ -19,12 +95,57 @@
 
       createApp({
         store,
+        copySummary() {
+          navigator.clipboard.writeText(store.summary);
+        },
+        copyRequest() {
+          navigator.clipboard.writeText(store.packageRequest);
+        },
       }).mount();
 
-      grist.ready();
+      grist.ready({
+        columns: [
+          {
+            name: "package",
+            title: "Package",
+            optional: false,
+            type: "Text",
+          },
+          {
+            name: "slug",
+            title: "Slug",
+            optional: false,
+            type: "Text",
+          },
+          {
+            name: "version",
+            title: "Version",
+            optional: false,
+            type: "Text",
+          },
+          {
+            name: "reason",
+            title: "Reason",
+            optional: false,
+            type: "Text",
+          },
+          {
+            name: "link",
+            title: "Link",
+            optional: true,
+            type: "Text",
+          },
+        ],
+      });
       grist.onRecord(function (record) {
-        console.log("Received record:", record);
-        store.setPackage(record);
+        const mapped = grist.mapColumnNames(record);
+        if (mapped) {
+          store.setPackage(mapped);
+        } else {
+          // Helper returned a null value. It means that not all
+          // required columns were mapped.
+          console.error("Please map all columns");
+        }
       });
     </script>
   </body>
