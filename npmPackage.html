@@ -1,17 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>onRecord</title>
     <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
   </head>
   <body>
-    <pre id="readout">Waiting for data...</pre>
-    <script>
+    <div v-scope="Package({ npmPackage: store.npmPackage })"></div>
+    <script type="module">
+      import { createApp, reactive } from "https://unpkg.com/petite-vue?module";
+
+      const store = reactive({
+        npmPackage: {},
+        setPackage(npmPackage) {
+          this.npmPackage = npmPackage;
+        },
+      });
+
+      function Package(props) {
+        return {
+          $template: "#package-template",
+          npmPackage: props.npmPackage,
+        };
+      }
+
+      createApp({
+        Package,
+        store,
+      }).mount();
+
       grist.ready();
-      grist.onRecord(function(record) {
-        document.getElementById('readout').innerHTML = JSON.stringify(record, null, 2);
+      grist.onRecord(function (record) {
+        store.setPackage(record);
       });
     </script>
+
+    <template id="package-template"> Package: {{ npmPackage }} </template>
   </body>
 </html>
