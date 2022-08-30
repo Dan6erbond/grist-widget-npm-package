@@ -11,46 +11,51 @@
   </head>
   <body>
     <div v-scope class="pa3">
-      <div class="avenir measure pa3 shadow-2 br2">
-        <div>
-          <p class="f4 lh-copy">Package Overview</p>
-          <p>
-            {{ store.npmPackage.package }}
-            <a
-              href="{{ store.packageLink }}"
-              target="_blank"
-              class="red hover-dark-red no-underline"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w1 h1"
+      <div class="avenir pa3 shadow-2 br2">
+        <div class="flex flex-wrap">
+          <div class="w-50-ns w-100">
+            <p class="f4 lh-copy">Package Overview</p>
+            <p>
+              {{ store.npmPackage.package }}
+              <a
+                href="{{ store.packageLink }}"
+                target="_blank"
+                class="red hover-dark-red no-underline"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
-                />
-              </svg>
-            </a>
-          </p>
-          <p><b>Version</b></p>
-          <p>{{ store.npmPackage.version }}</p>
-        </div>
-        <div v-if="store.npmPackage.reason !== undefined">
-          <p class="f4 lh-copy">Package Request</p>
-          <div class="bg-near-white pa2">
-            <p><b>Summary</b></p>
-            <p class="code">{{ store.summary }}</p>
-            <button @click="copySummary()">Copy</button>
-            <p><b>Description</b></p>
-            <textarea readonly class="code" wrap="soft" cols="40" rows="15">
-              {{ store.packageRequest }}
-            </textarea>
-            <button @click="copyRequest()">Copy</button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w1 h1"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+                  />
+                </svg>
+              </a>
+            </p>
+            <p><b>Version</b></p>
+            <p>{{ store.npmPackage.version }}</p>
+          </div>
+          <div
+            v-if="store.npmPackage.reason !== undefined"
+            class="w-50-ns w-100"
+          >
+            <p class="f4 lh-copy">Package Request</p>
+            <div class="bg-near-white pa2 w-100">
+              <p><b>Summary</b></p>
+              <p class="code">{{ store.summary }}</p>
+              <button @click="copySummary()">Copy</button>
+              <p><b>Description</b></p>
+              <textarea readonly class="code w-100" wrap="soft" rows="15">
+{{ store.packageRequest }}</textarea
+              >
+              <button @click="copyRequest()">Copy</button>
+            </div>
           </div>
         </div>
       </div>
@@ -76,17 +81,15 @@
           );
         },
         get packageRequest() {
-          return `
-      Paket: ${this.npmPackage.package}
+          return `Paket: ${this.npmPackage.package}
 
-      Version: ${this.npmPackage.version}
+Version: ${this.npmPackage.version}
 
-      Link: ${this.packageLink}
+Link: ${this.packageLink}
 
-      Begründung:
+Begründung:
 
-      ${this.npmPackage.reason}
-      `;
+${this.npmPackage.reason}`.trim();
         },
         setPackage(npmPackage) {
           this.npmPackage = npmPackage;
