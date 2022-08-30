@@ -6,7 +6,7 @@
     <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
   </head>
   <body>
-    <div v-scope="Package({ npmPackage: store.npmPackage })"></div>
+    <div v-scope>Package: {{ store.npmPackage }}</div>
     <script type="module">
       import { createApp, reactive } from "https://unpkg.com/petite-vue?module";
 
@@ -17,15 +17,7 @@
         },
       });
 
-      function Package(props) {
-        return {
-          $template: "#package-template",
-          npmPackage: props.npmPackage,
-        };
-      }
-
       createApp({
-        Package,
         store,
       }).mount();
 
@@ -35,7 +27,5 @@
         store.setPackage(record);
       });
     </script>
-
-    <template id="package-template"> Package: {{ npmPackage }} </template>
   </body>
 </html>
